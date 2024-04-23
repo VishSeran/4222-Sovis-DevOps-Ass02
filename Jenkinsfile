@@ -1,37 +1,42 @@
-pipeline {
-    agent any 
+pipeline{
+    agent any
     
-    stages { 
-        stage('SCM Checkout') {
-            steps {
-                retry(3) {
-                    git branch: 'main', url: 'https://github.com/HGSChandeepa/test-node'
+    stages{
+        stage('SCM Chechout'){
+            steps{
+                retry(3){
+                    git branch: 'main', url: 'https://github.com/VishSeran/4222-Sovis-DevOps-Ass02'
                 }
             }
         }
-        stage('Build Docker Image') {
-            steps {  
-                bat 'docker build -t adomicarts/nodeapp-cuban:%BUILD_NUMBER% .'
+        
+        stage('Build Docker Image'){
+            steps{
+                bat 'docker build -t VishSeran/vads-docker:%BUILD_NUMBER% .'
             }
         }
-        stage('Login to Docker Hub') {
-            steps {
-                withCredentials([string(credentialsId: 'samin-docker', variable: 'samindocker')]) {
-                    script {
-                        bat "docker login -u adomicarts -p %samindocker%"
+        
+        stage('Login to DockerHub'){
+            steps{
+                withCredentials([string(credentialsId: 'dockerhub-password', variable: 'docker-Pass')]) {
+                    script{
+                        bat 'docker login -u seranvishwa -p ${docker-pass}'
                     }
                 }
             }
         }
-        stage('Push Image') {
-            steps {
-                bat 'docker push adomicarts/nodeapp-cuban:%BUILD_NUMBER%'
+        
+        stage('Push Image'){
+            steps{
+                bat 'docker push VishSeran/vads-docker:%BUILD_NUMBER%'
             }
         }
+        
+        
     }
-    post {
-        always {
-            bat 'docker logout'
+    post{
+            always{
+                bat 'docker logout'
+            }
         }
-    }
 }
